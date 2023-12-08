@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  chatRooms         ChatRoomsOnUsers[]
+  sentMessages      ChatMessage[]
+
+  @@map("users")
+}
+
+model ChatRoom {
+  id        Int                         @id @default(autoincrement())
+  name      String
+  users     ChatRoomsOnUsers[]
+  chatMessages ChatMessage[]
+
+  @@map("chat_rooms")
+}
+
+model ChatMessage {
+  id            Int                     @id @default(autoincrement())
+  text          String
+  fromUserId    Int
+  fromUser      User                    @relation(fields: [fromUserId], references: [id])
+  toRoomId      Int
+  toRoom        ChatRoom                @relation(fields: [toRoomId], references: [id])
+  createdAt DateTime                    @default(now())
+
+  @@map("chat_messages")
+}
+
+model ChatRoomsOnUsers {
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    Int
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+
+  @@id([userId, roomId])
+  @@map("chat_rooms_on_users")
+}
+
+// model ChatMessagesOnUsers {
+//   chatMessageId Int           @id
+//   chatMessage   ChatMessage   @relation(fields: [chatMessageId], references: [id])
+//   fromUserId    Int
+//   fromUser      User          @relation(fields: [fromUserId], references: [id])
+//   toChatRoomId      Int
+//   toChatRoom        ChatRoom          @relation(fields: [toChatRoomId], references: [id])
+
+//   @@map("chat_messages_on_users")
+// }
+
+// model ChatRoomsOnUsersAsMaster {
+//   userId    Int
+//   user      User     @relation(fields: [userId], references: [id])
+//   roomId    Int
+//   room      ChatRoom @relation(fields: [roomId], references: [id])
+
+//   @@id([userId, roomId])
+//   @@map("chat_rooms_on_users_as_master")
+
+// }
+
+// model User {
+//   id                Int                 @id @default(autoincrement())
+
+//   sentMessages      ChatsOnUsers[]      @relation("ChatsOnUsers_fromUser")
+//   receivedMessages  ChatsOnUsers[]      @relation("ChatsOnUsers_toUser")
+
+//   chatRooms         ChatRoomsOnUsers[]
+
+//   @@map("users")
+// }
+
+// model ChatRoom {
+//   id        Int                   @id @default(autoincrement())
+//   name      String
+//   messages  ChatMessage[]
+//   users     ChatRoomsOnUsers[]
+//   createAt  DateTime              @default(now())
+//   updatedAt DateTime              @updatedAt
+
+//   @@map("chat_rooms")
+// }
+
+// model ChatMessage {
+//   id        Int              @id @default(autoincrement())
+//   text      String
+//   room      ChatRoom         @relation(fields: [roomId], references: [id])
+//   roomId    Int
+//   createdAt DateTime         @default(now())
+//   chatUsers ChatsOnUsers[]
+
+//   @@map("chat_messages")
+// }
+
+// model ChatsOnUsers {
+//   chatMessageId Int           @id
+//   chatMessage   ChatMessage   @relation(fields: [chatMessageId], references: [id])
+//   fromUserId    Int
+//   fromUser      User          @relation(fields: [fromUserId], references: [id], name: "ChatsOnUsers_fromUser")
+//   toUserId      Int
+//   toUser        User          @relation(fields: [toUserId], references: [id], name: "ChatsOnUsers_toUser")
+
+//   @@map("chats_on_users")
+// }
+
+// model ChatRoomsOnUsers {
+//   userId    Int
+//   user      User     @relation(fields: [userId], references: [id])
+//   roomId    Int
+//   room      ChatRoom @relation(fields: [roomId], references: [id])
+
+//   @@id([userId, roomId])
+//   @@map("chat_rooms_on_users")
+// }
